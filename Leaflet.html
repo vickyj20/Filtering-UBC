@@ -126,7 +126,9 @@ var OpenMapSurfer_Roads = L.tileLayer('https://maps.heigit.org/openmapsurfer/til
       addField();
       FieldToHighlight = ""; // reset so that "Show All Name" works.
     }
-
+	var marker = L.marker([49.2660, -123.2562]).addTo(map);
+	marker.bindPopup("<b> Geography Building </b><br> 984 West Mall, Vancouver, BC V6T 1Z2").openPopUp(); 
+	  
     var FieldGeoJSONdata;
 
 
