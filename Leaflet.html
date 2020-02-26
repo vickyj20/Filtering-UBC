@@ -42,9 +42,7 @@ var OpenMapSurfer_Roads = L.tileLayer('https://maps.heigit.org/openmapsurfer/til
 	attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> | Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }
     ).addTo(map);
-
-  var marker = L.marker([49.2660, -123.2562]).addTo(map);
-	marker.bindPopup("<b> Geography Building </b><br> 984 West Mall, Vancouver, BC V6T 1Z2").openPopUp(); 
+	  
     // load GeoJSON from a file on the web
     // $ is jQuery.
 
@@ -56,6 +54,8 @@ var OpenMapSurfer_Roads = L.tileLayer('https://maps.heigit.org/openmapsurfer/til
       opacity: 0.2,
       fillOpacity: 0.2
     };
+var marker = L.marker([49.2660, -123.2562]).addTo(map);
+	marker.bindPopup("<b> Geography Building </b><br> 984 West Mall, Vancouver, BC V6T 1Z2").openPopUp(); 
 
     function onEachField(feature, layer) {
       // does this tree even have a property named Placename?
