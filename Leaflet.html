@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Exercise</title>
+	<meta charset="utf-8" />
+
+	<!-- Leaflet styles and code. Place in the <head></head> element. -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />	
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+	<!-- jQuery is a library that simplifies many things in JavaScript. 
+	     We'll use it to retrieve data from the web. -->   
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+	
+</head>
+<body>
+
+  <div id="mapid" style="width: 600px; height: 400px;"></div>
+	<!-- Our web map will get placed into this div element -->
+ <div id="controls" style="margin: 15px;">
+    <button id="showAllFieldsButton">Show All Fields</button>
+
+    <span style="display:inline-block; width: 30px"></span>
+    <input type="text" id="highlightFieldsTextEntry"
+           placeholder="Field Names">
+    <button id="highlightFieldsButton">Highlight</button>
+    
+	</div>
+
+  <script>
+    
+    // Make a Leaflet map with L.map().
+    // Store the map in the variable 'map'.
+    // "mapid" is the 'id' of the DOM element to contain the map.
+    var map = L.map('mapid',
+                    { 
+      			center: [49.2605, -123.2476],
+      			zoom:14
+    			}  // this object holds map options
+              );
+    
+		var topoTiles = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+                      {
+			maxZoom: 25,
+			attribution: 'Basemap data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Basemap style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			}
+			).addTo(map);
+  var marker = L.marker([49.2660, -123.2562]).addTo(map);
+	marker.bindPopup("<b> Geography Building </b><br> 984 West Mall, Vancouver, BC V6T 1Z2").openPopUp(); 
+
+// load GeoJSON from a file on the web
+    // $ is jQuery.
+     var FieldMarkerOptions = {
+      radius: 4,
+      fillColor: "#007800",
+      color: "#000",
+      weight: 1,
+      opacity: 0.2,
+      fillOpacity: 0.2
+    };
+
+    function onEachField(feature, layer) {
+      // does this tree even have a property named Placename?
+      if (feature.properties && feature.properties.NAME) {
+        layer.bindTooltip(feature.properties.NAME);
+      }
+    }
+
+    function FieldPointToLayer(feature, latlng) {
+      return L.circleMarker(
+        latlng,
+        FieldMarkerOptions
+      );
+    }
+
+    function FieldToFilter(feature, layer) {
+      if (FieldToHighlight === "") {
+        return true;
+        // In this case, we're not highlighting anything, so draw everything.
+      } else if (feature.properties && feature.properties.NAME) {
+        // We just checked to make sure there are properties to avoid an error
+        //   by asking for the .NAME when there are no properties.
+        // Now, we need to check to see if the .NAME includes the search string we're
+        //   trying to highlight.
+        return feature.properties.NAME.toLowerCase().includes(FieldToHighlight.toLowerCase());
+        // We ignore uppercase/lowercase differences.
+      } else {
+        return false;
+        // This is for features that lack properties.
+        // Don't display them.
+      }
+    }
+
+    var lastLayerAdded = {};
+
+    function addField() {
+      if (map.hasLayer(lastLayerAdded)) {
+        map.removeLayer(lastLayerAdded);
+      }
+      lastLayerAdded = L.geoJSON(FieldGeoJSONdata, {
+        pointToLayer: FieldPointToLayer,
+        onEachFeature: onEachField,
+        filter: FieldToFilter
+      });
+      lastLayerAdded.addTo(map);
+    };
+
+    var FieldToHighlight = "";
+    // This is set by someone pressing the highlight button.
+    // If it's an empty string, then just draw everything.
+
+    function highlightField() {
+      FieldToHighlight = document
+        .getElementById("highlightFieldTextEntry")
+        .value;
+      addField();
+      FieldToHighlight = ""; // reset so that "Show All Name" works.
+    }
+
+    var FieldGeoJSONdata;
+	  
+$.getJSON("https://raw.githubusercontent.com/UBCGeodata/ubcv-landscape/master/geojson/ubcv_fields.geojson",
+     function(data){
+      // Store data for later:
+        FieldGeoJSONdata = data;
+        // Create event listener for ShowAllName Button:
+        document
+          .getElementById("showAllFieldsButton")
+          .addEventListener("click", addField);
+
+        document
+          .getElementById("highlightFieldButton")
+          .addEventListener("click", highlightField);
+
+      }
+    );
+    	// Once UBC trees GeoJSON layer is loaded
+      	// Then add it to the map 
+ 
+
+    
+  </script>
+
+</body>
+</html>
